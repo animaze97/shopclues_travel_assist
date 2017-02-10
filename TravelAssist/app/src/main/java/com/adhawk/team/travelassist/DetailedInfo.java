@@ -10,6 +10,7 @@ import android.widget.TextView;
 public class DetailedInfo extends AppCompatActivity {
     TextView shop_name,shop_intro,discountORusage,RatingORcontact,sub1,sub2;
     String name,intro,type,disORusage,ratingORcontact;
+    Button homeBtn;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -20,6 +21,7 @@ public class DetailedInfo extends AppCompatActivity {
         RatingORcontact = (TextView) findViewById(R.id.rating_contct);
         sub1= (TextView) findViewById(R.id.sheading1);
         sub2 = (TextView) findViewById(R.id.sheading2);
+        homeBtn = (Button) findViewById(R.id.btn_home);
 
         name = getIntent().getStringExtra("Shop_name").toString();
         intro = getIntent().getStringExtra("shop_intro").toString();
@@ -40,7 +42,7 @@ public class DetailedInfo extends AppCompatActivity {
             RatingORcontact.setText(ratingORcontact);
         }
 
-        if(type=="shop"){
+        if(type.equalsIgnoreCase("shop")){
             sub1.setText("Discount");
             sub2.setText("Rating");
         }
@@ -48,6 +50,12 @@ public class DetailedInfo extends AppCompatActivity {
             sub1.setText("Uses");
             sub2.setText("Contact");
         }
+        homeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(),startScreen.class));
+            }
+        });
 
     }
 }

@@ -21,9 +21,9 @@ public class LocateUser
 
     public LocateUser()
     {
-        this.beacon_pos.add(new Pair<Integer, Integer>(0,1));
+        this.beacon_pos.add(new Pair<Integer, Integer>(3,1));
         this.beacon_pos.add(new Pair<Integer, Integer>(4,1));
-        this.beacon_pos.add(new Pair<Integer, Integer>(3,5));
+        this.beacon_pos.add(new Pair<Integer, Integer>(2,1));
 
         this.obstacle_pos.add(new Pair<Integer, Integer>(13,15));
         this.obstacle_pos.add(new Pair<Integer, Integer>(15,15));
@@ -59,7 +59,7 @@ public class LocateUser
         }
     }
 
-    String getNearbyPoi(String major)
+    public static String getNearbyPoi(String major)
     {
         switch (major)
         {

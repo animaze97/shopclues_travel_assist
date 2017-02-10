@@ -1,5 +1,6 @@
 package com.adhawk.team.travelassist;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Color;
@@ -51,6 +52,7 @@ public class Navigation extends AppCompatActivity implements BeaconConsumer {
     MyMap myMap;
     double distanceForPopup = 0.5;
     String nearbyPoi = "";
+    int popUpFreq[] = {2,2,2,2,2,2};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -229,39 +231,52 @@ public class Navigation extends AppCompatActivity implements BeaconConsumer {
                         popupBeacon = beacon;
                     }
                 }
-                if(minDistance < distanceForPopup && popupBeacon != null){
-                    nearbyPoi = ""/*getNearbyPoi(popupBeacon.getId2())*/;
-                    final Dialog dialog = new Dialog(getApplicationContext(), R.style.CustomDialogTheme);
-                    dialog.setContentView(R.layout.poi_nearby_popup);
-                    Requester.setDisplayHeightWidth(dialog, getApplicationContext(),0.80,0.70);
-                    dialog.setCancelable(true);
+                final Beacon finalPopUpBeacon = popupBeacon;
+                if(minDistance < distanceForPopup && finalPopUpBeacon != null){
+                    int beaconIndex = getInt(popupBeacon.getId2().toString());
+                    if(popUpFreq[beaconIndex]>0){
+                        popUpFreq[beaconIndex]--;
+                        resetArray(beaconIndex);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                nearbyPoi = LocateUser.getNearbyPoi(finalPopUpBeacon.getId2().toString());
+                                final Dialog dialog = new Dialog(Navigation.this);
+                                dialog.setContentView(R.layout.poi_nearby_popup);
+                                dialog.setTitle("POI in proximity");
+                                Requester.setDisplayHeightWidth(dialog, Navigation.this,0.80,0.70);
+                                dialog.setCancelable(true);
+                                if(!((Activity) Navigation.this).isFinishing())
+                                {
+                                    dialog.show();
+                                }
+                                final Button continueNavBtn = (Button) dialog.findViewById(R.id.btn_continue_nav);
+                                final Button getDetailsBtn = (Button) dialog.findViewById(R.id.btn_get_details);
+                                final TextView poiName = (TextView) dialog.findViewById(R.id.nearby_poi_name);
+                                poiName.setText(nearbyPoi);
+                                final String poiNameNearby = nearbyPoi;
+                                getDetailsBtn.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        dialog.dismiss();
+                                        new makeQuery().execute(MainActivity.URI + "base/getDetail/",poiNameNearby);
 
-                    final Button continueNavBtn = (Button) dialog.findViewById(R.id.btn_continue_nav);
-                    final Button getDetailsBtn = (Button) dialog.findViewById(R.id.btn_get_details);
-                    final TextView poiName = (TextView) dialog.findViewById(R.id.nearby_poi_name);
-                    poiName.setText(nearbyPoi);
-                    final String poiNameNearby = nearbyPoi;
-                    getDetailsBtn.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            new makeQuery().execute(MainActivity.URI + "base/getDetail/",poiNameNearby);
-                            dialog.dismiss();
-                        }
-                    });
-                    continueNavBtn.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            if(nearbyPoi.equalsIgnoreCase(poiSelected)){
-                                startActivity(new Intent(getApplicationContext(),startScreen.class));
+                                    }
+                                });
+                                continueNavBtn.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        if(nearbyPoi.equalsIgnoreCase(poiSelected)){
+                                            startActivity(new Intent(getApplicationContext(),startScreen.class));
+                                        }
+                                        dialog.dismiss();
+                                    }
+                                });
+
                             }
-                            else{
-                            }
-                            dialog.dismiss();
-                        }
-                    });
-                    dialog.show();
+                        });
 
-
+                    }
                 }
                 if(beacons.size() == 3){
                     //
@@ -318,12 +333,12 @@ public class Navigation extends AppCompatActivity implements BeaconConsumer {
         height -= 1500;
         width -= 135;
         int x=12,y=12;
-        Log.d(iTAG,"height"+String.valueOf(height));
-        Log.d(iTAG,"width"+String.valueOf(width));
+        Log.d(iTAG,"height "+String.valueOf(height));
+        Log.d(iTAG,"width "+String.valueOf(width));
         for(Pair<Integer,Integer> pt : temp){
             x = pt.getFirst();
             y = pt.getSecond();
-            points.add(new Pair<Integer, Integer>((width/24)*(x)+20,(height/24)*(y)+20));
+            points.add(new Pair<Integer, Integer>((width/6)*(x)+20,(height/6)*(y)+20));
         }
         myMap.setPoints(points);
 
@@ -333,19 +348,18 @@ public class Navigation extends AppCompatActivity implements BeaconConsumer {
                 myMap.invalidate();
             }
         });
-        //myMap.invalidate();
 
-        runOnUiThread(new Runnable() {
+     /*   runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 myMap.invalidate();
             }
-        });
+        });*/
     }
 
     public void clearCanvas(){
-        MyMap.clearCanvas = true;
-        MyMap.points = new ArrayList<>();
+       /* MyMap.clearCanvas = true;
+        //MyMap.points = new ArrayList<>();
         //myMap.invalidate();
         runOnUiThread(new Runnable() {
             @Override
@@ -353,6 +367,7 @@ public class Navigation extends AppCompatActivity implements BeaconConsumer {
                 myMap.invalidate();
             }
         });
+        MyMap.clearCanvas = false;*/
     }
 
     public class makeQuery extends AsyncTask<String, String, String> {
@@ -394,15 +409,16 @@ public class Navigation extends AppCompatActivity implements BeaconConsumer {
                     intent.putExtra("shop_intro",reader.getString("intro"));
                     intent.putExtra("type",type);
                     if(type.equalsIgnoreCase("shop")){
+                        intent.putExtra("discount_usage",reader.getString("pdis"));
+                        intent.putExtra("rating_contact",reader.getString("rating"));
+                    }
+                    else{
                         intent.putExtra("discount_usage",reader.getString("usage"));
                         intent.putExtra("rating_contact",reader.getString("contact_details"));
                     }
-                    else{
-                        intent.putExtra("discount_usage",reader.getString("pids"));
-                        intent.putExtra("rating_contact",reader.getString("rating"));
-                    }
                     startActivity(intent);
-                    return;
+                    finish();
+                   // return;
                 }
 
 
@@ -415,6 +431,18 @@ public class Navigation extends AppCompatActivity implements BeaconConsumer {
         protected void onPreExecute() {
 
         }
+    }
+    public void resetArray(int index){
+        for(int i=0;i<6;i++){
+            if(i==index)continue;
+            popUpFreq[i] = 2;
+        }
+    }
+    public int getInt(String major){
+        if(major.equalsIgnoreCase("11111"))return 1;
+        else if(major.equalsIgnoreCase("22222"))return 2;
+        else if(major.equalsIgnoreCase("33333"))return 3;
+        else return 4;
     }
 
 }

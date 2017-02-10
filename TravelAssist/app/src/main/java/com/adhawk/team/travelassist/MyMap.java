@@ -37,7 +37,7 @@ public class MyMap extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        if(clearCanvas)canvas.drawColor(Color.WHITE);
+       // if(clearCanvas)canvas.drawColor(Color.WHITE);
         for(Pair<Integer,Integer> p : points){
             canvas.drawCircle(p.getFirst(),p.getSecond(),20,drawPaint);
         }
