@@ -1,6 +1,6 @@
 package com.adhawk.team.travelassist;
-
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by AJ on 12/29/2016.
@@ -13,6 +13,12 @@ public class LocateUser
     static ArrayList<Pair<Integer, Integer>> dest_pos = new ArrayList<Pair<Integer, Integer>>();
     static ArrayList<Pair<Integer, Integer>> obstacle_pos = new ArrayList<Pair<Integer, Integer>>();
 
+    static int x_min;
+    static int x_max;
+    static int y_min;
+    static int y_max;
+
+
     public LocateUser()
     {
         this.beacon_pos.add(new Pair<Integer, Integer>(0,1));
@@ -24,6 +30,8 @@ public class LocateUser
         this.obstacle_pos.add(new Pair<Integer, Integer>(15, 13));
         this.obstacle_pos.add(new Pair<Integer, Integer>(13, 13));
 
+
+
         this.room_pos.add(new Pair<Integer, Integer>(0,24));
         this.room_pos.add(new Pair<Integer, Integer>(24,24));
         this.room_pos.add(new Pair<Integer, Integer>(24,0));
@@ -32,9 +40,15 @@ public class LocateUser
 
         this.dest_pos.add(new Pair<Integer, Integer>(0,24));
         this.dest_pos.add(new Pair<Integer, Integer>(24,24));
+
+        x_min=0;
+        y_min=0;
+        x_max=24;
+        y_max=24;
     }
 
-    public static int getPos(String s) {
+    public static int getPos(String s)
+    {
         //return (int)(Math.random()*3);
         switch (s)
         {
@@ -45,10 +59,23 @@ public class LocateUser
         }
     }
 
+    String getNearbyPoi(String major)
+    {
+        switch (major)
+        {
+            case "11111": return "Delicious Restaurant";
+            case "22222": return "Gift Shop";
+            case "33333": return "Security Check";
+            case "44444": return "Check-in Counter";
+            default: return "Delicious Restaurant";
+        }
+    }
+
     public static Pair<Integer, Integer> getUserLocation(ArrayList<Double> beacon_dist, ArrayList<String> major)  //List of user distance from every beacon
     {
         //return new Pair<Integer, Integer>((int)(Math.random()*24),(int)(Math.random()*24));
         double fac1 = 1.5,fac2 = 1.5, fac3 = 1.5, fac4 = 1;
+        Pair<Integer, Integer> ans;
         //Uncomment this code for working beacons
         double p1, p2, q1, q2; //Point of intersection of two circles
         double d, l, h, x1 = -1, x2 = -1, y1=-1, y2= -1, x3 = -1, y3=-1;
@@ -60,21 +87,23 @@ public class LocateUser
         }
         if(found < 2)
         {
-            return new Pair<Integer, Integer>(-1000, -1000);
+            ans =  new Pair<Integer, Integer>(-1000, -1000);
         }
         else
         {
             for(int i=0; i<beacon_dist.size(); i++)
             {
-                switch(major.get(i))
-                {
-                    case "11111":  beacon_dist.set(i, beacon_dist.get(i)*1.8);
+                switch(major.get(i)) {
+                    case "11111":
+                        beacon_dist.set(i, beacon_dist.get(i) * 1.2);
                         break;
 
-                    case "22222" : beacon_dist.set(i, beacon_dist.get(i)*1.35);
+                    case "22222":
+                        beacon_dist.set(i, beacon_dist.get(i) * 1.2);
                         break;
 
-                    case "33333" : beacon_dist.set(i, beacon_dist.get(i)*1.2);
+                    case "33333":
+                        beacon_dist.set(i, beacon_dist.get(i) * 1.2);
                         break;
 
                 }
@@ -108,7 +137,7 @@ public class LocateUser
             if(found == 2)
             {
                 int x = (int)(p1+p2/2), y = (int)((q1+q2)/2);
-                return new Pair<Integer, Integer>(x, y);
+                ans =  new Pair<Integer, Integer>(x, y);
             }
             else
             {
@@ -117,16 +146,45 @@ public class LocateUser
                 d2 = Math.sqrt(Math.pow((p2-x3),2) + Math.pow((q2-y3),2));
                 if(Math.abs(beacon_dist.get(2) - d1) > Math.abs(beacon_dist.get(2) - d2))
                 {
-                    return new Pair<Integer, Integer>((int)p2, (int)q2);
+                    ans = new Pair<Integer, Integer>((int)p2, (int)q2);
                 }
                 else
                 {
-                    return new Pair<Integer, Integer>((int)p1, (int)q1);
+                    ans =  new Pair<Integer, Integer>((int)p1, (int)q1);
                 }
             }
 
 
         }
+        int min_i = 0;
+        if(ans.getFirst() == 0 && ans.getSecond() == 0) //Invalid User Location
+        {
+
+            double min_dist = beacon_dist.get(0);
+            for(int i=0; i<3; i++)
+            {
+                if(beacon_dist.get(i) < min_dist)
+                {
+                    min_i = i;
+                }
+            }
+
+            double add_value = beacon_dist.get(min_i)/1.414;
+
+            double updated_x = beacon_pos.get(min_i).getFirst()+add_value;
+            double updated_y = beacon_pos.get(min_i).getSecond()+add_value;
+            if(updated_x < x_min || updated_x > x_max)
+            {
+                updated_x -= 2*add_value;
+            }
+            if(updated_y < y_min || updated_y > y_max)
+            {
+                updated_y -= 2*add_value;
+            }
+            //System.out.println("\nDewesh Deo Singh");
+            ans = new Pair<Integer, Integer>((int)updated_x, (int)updated_y);
+        }
+        return ans;
     }
 
     public Pair<Double, ArrayList<String>> getDestinationInfo(Pair<Integer, Integer> user_loc, Pair<Integer, Integer> destination)

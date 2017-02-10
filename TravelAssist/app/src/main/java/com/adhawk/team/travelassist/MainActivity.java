@@ -15,7 +15,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
     private static final String TAG = "tag";
     Button button;
-
+    public static String URI = "http://192.168.29.49:8888/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

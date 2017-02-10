@@ -30,13 +30,17 @@
             android:name=".startScreen"
             android:label=""
             android:theme="@style/AppTheme" />
+        <activity
+            android:name=".Navigation"
+            android:label=""
+            android:theme="@style/AppTheme" />
 
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
         <activity android:name=".BasicInfo" />
-        <activity android:name=".Navigation"></activity>
+        <activity android:name=".DetailedInfo"/>
     </application>
 
 </manifest>

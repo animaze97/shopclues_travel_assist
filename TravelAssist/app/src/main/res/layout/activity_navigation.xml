@@ -44,7 +44,7 @@
         </LinearLayout>
 
 
-    <com.abc.team.becathon.MyMap
+    <com.adhawk.team.travelassist.MyMap
         android:layout_width="match_parent"
         android:layout_height="150dp"
         android:id="@+id/my_map"

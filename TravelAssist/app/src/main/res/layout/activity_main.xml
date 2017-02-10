@@ -14,13 +14,13 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="71dp"
-        android:textSize="80dp"
-        android:text="About Travel Assist"/>
+        android:textSize="40dp"
+        android:text="New to the place..?  Not anymore.. Find all the places nearby and navigate to them using our Happy2Help application :)"/>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="What's Around ..?"
+        android:text="Whats Around ..?"
         android:id="@+id/whatsAroundButton"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"

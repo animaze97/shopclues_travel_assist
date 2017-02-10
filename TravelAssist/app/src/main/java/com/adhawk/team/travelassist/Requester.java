@@ -1,6 +1,11 @@
 package com.adhawk.team.travelassist;
 
+import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Point;
+import android.os.Build;
+import android.view.WindowManager;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -45,6 +50,26 @@ public class Requester {
         }
         return null;
     }
+    public static void setDisplayHeightWidth(final Dialog getInLineDialog, Context context, double _width, double _height){
+        //code below to set custom height and width to the dialog
+        //get height and width
+        WindowManager manager = (WindowManager) context.getSystemService(Activity.WINDOW_SERVICE);
+        int width, height;
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.FROYO) {
+            width = manager.getDefaultDisplay().getWidth();
+            height = manager.getDefaultDisplay().getHeight();
+        } else {
+            Point point = new Point();
+            manager.getDefaultDisplay().getSize(point);
+            width = point.x;
+            height = point.y;
+        }
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        lp.copyFrom(getInLineDialog.getWindow().getAttributes());
+        lp.width = (int)(width*_width);
+        lp.height = (int)(height*_height);
+        getInLineDialog.getWindow().setAttributes(lp);
 
+    }
 
 }

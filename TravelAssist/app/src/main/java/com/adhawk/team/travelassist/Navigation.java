@@ -1,9 +1,11 @@
 package com.adhawk.team.travelassist;
 
+import android.app.Dialog;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.os.AsyncTask;
 import android.os.RemoteException;
-import android.support.annotation.IntegerRes;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,6 +15,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconConsumer;
@@ -22,7 +25,11 @@ import org.altbeacon.beacon.Identifier;
 import org.altbeacon.beacon.MonitorNotifier;
 import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -39,9 +46,11 @@ public class Navigation extends AppCompatActivity implements BeaconConsumer {
     //Button bt_stopNavigation;
     ArrayList<String> instructions;
     ArrayAdapter<String> adapter;
-    String classSelected = "Python";
+    String poiSelected = "Python";
     int cnt = 0;
     MyMap myMap;
+    double distanceForPopup = 0.5;
+    String nearbyPoi = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,7 +102,7 @@ public class Navigation extends AppCompatActivity implements BeaconConsumer {
 
         lv_previousInstruction.setAdapter(adapter);
         lv_previousInstruction.setBackgroundColor(Color.CYAN);
-        tv_currentClass.setText(classSelected + " class");
+        tv_currentClass.setText(poiSelected);
     }
 
 
@@ -118,20 +127,51 @@ public class Navigation extends AppCompatActivity implements BeaconConsumer {
         clearCanvas();
         plotPoints(LocateUser.beacon_pos);
 
-        if(getIntent().getStringExtra("selected_class")!=null){
-            classSelected = getIntent().getStringExtra("selected_class");
-            if(classSelected.equalsIgnoreCase("Python")){
+        if(getIntent().getStringExtra("selected_poi")!=null){
+            poiSelected = getIntent().getStringExtra("selected_poi");
+            if(poiSelected.equalsIgnoreCase("Boarding Counter")){
                 ArrayList<Pair<Integer,Integer>> points = new ArrayList<>();
-                destinationLocation = new Pair<Integer, Integer>(-2,10);
+                destinationLocation = new Pair<Integer, Integer>(2,0);
                 points.add(destinationLocation);
                 plotPoints(points);
             }
-            else{
+            else if(poiSelected.equalsIgnoreCase("Security Check")){
                 ArrayList<Pair<Integer,Integer>> points = new ArrayList<>();
-                destinationLocation = new Pair<Integer, Integer>(-2,10);
+                destinationLocation = new Pair<Integer, Integer>(0,4);
                 points.add(destinationLocation);
                 plotPoints(points);
             }
+            else if(poiSelected.equalsIgnoreCase("Check-in Counter")){
+                ArrayList<Pair<Integer,Integer>> points = new ArrayList<>();
+                destinationLocation = new Pair<Integer, Integer>(3,3);
+                points.add(destinationLocation);
+                plotPoints(points);
+            }
+            else if(poiSelected.equalsIgnoreCase("Utility Store")){
+                ArrayList<Pair<Integer,Integer>> points = new ArrayList<>();
+                destinationLocation = new Pair<Integer, Integer>(6,3);
+                points.add(destinationLocation);
+                plotPoints(points);
+            }
+            else if(poiSelected.equalsIgnoreCase("Gift Shop")){
+                ArrayList<Pair<Integer,Integer>> points = new ArrayList<>();
+                destinationLocation = new Pair<Integer, Integer>(5,2);
+                points.add(destinationLocation);
+                plotPoints(points);
+            }
+            else if(poiSelected.equalsIgnoreCase("Delicious Restaurant")){
+                ArrayList<Pair<Integer,Integer>> points = new ArrayList<>();
+                destinationLocation = new Pair<Integer, Integer>(4,4);
+                points.add(destinationLocation);
+                plotPoints(points);
+            }
+            else {
+                ArrayList<Pair<Integer,Integer>> points = new ArrayList<>();
+                destinationLocation = new Pair<Integer, Integer>(3,3);
+                points.add(destinationLocation);
+                plotPoints(points);
+            }
+            tv_currentClass.setText(poiSelected);
         }
     }
 
@@ -179,8 +219,48 @@ public class Navigation extends AppCompatActivity implements BeaconConsumer {
         beaconManager.setRangeNotifier(new RangeNotifier() {
             @Override
             public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
+
+                double minDistance = 100;
+                Beacon popupBeacon = null;
                 for(Beacon beacon : beacons){
                     Log.d(TAG,beacon.getId1()+" "+beacon.getId2()+" "+beacon.getId3()+" distance : "+beacon.getDistance());
+                    if(minDistance > beacon.getDistance()){
+                        minDistance = beacon.getDistance();
+                        popupBeacon = beacon;
+                    }
+                }
+                if(minDistance < distanceForPopup && popupBeacon != null){
+                    nearbyPoi = ""/*getNearbyPoi(popupBeacon.getId2())*/;
+                    final Dialog dialog = new Dialog(getApplicationContext(), R.style.CustomDialogTheme);
+                    dialog.setContentView(R.layout.poi_nearby_popup);
+                    Requester.setDisplayHeightWidth(dialog, getApplicationContext(),0.80,0.70);
+                    dialog.setCancelable(true);
+
+                    final Button continueNavBtn = (Button) dialog.findViewById(R.id.btn_continue_nav);
+                    final Button getDetailsBtn = (Button) dialog.findViewById(R.id.btn_get_details);
+                    final TextView poiName = (TextView) dialog.findViewById(R.id.nearby_poi_name);
+                    poiName.setText(nearbyPoi);
+                    final String poiNameNearby = nearbyPoi;
+                    getDetailsBtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            new makeQuery().execute(MainActivity.URI + "base/getDetail/",poiNameNearby);
+                            dialog.dismiss();
+                        }
+                    });
+                    continueNavBtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if(nearbyPoi.equalsIgnoreCase(poiSelected)){
+                                startActivity(new Intent(getApplicationContext(),startScreen.class));
+                            }
+                            else{
+                            }
+                            dialog.dismiss();
+                        }
+                    });
+                    dialog.show();
+
 
                 }
                 if(beacons.size() == 3){
@@ -273,6 +353,68 @@ public class Navigation extends AppCompatActivity implements BeaconConsumer {
                 myMap.invalidate();
             }
         });
+    }
+
+    public class makeQuery extends AsyncTask<String, String, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            try {
+                URL url = new URL(params[0]);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                JSONObject jsonParam = new JSONObject();
+                jsonParam.put("name", params[1]);
+                return Requester.make_request(urlConnection, jsonParam.toString(), getApplicationContext());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            if (s == null) {
+                Toast.makeText(getApplicationContext(), "Server Error", Toast.LENGTH_LONG).show();
+                return;
+            }
+            try {
+                JSONObject reader = new JSONObject(s);
+                if (reader.getInt("status") != 200) {
+                    Toast.makeText(getApplicationContext(), reader.getString("message"), Toast.LENGTH_LONG).show();
+                    return;
+                }
+                else{
+                    Toast.makeText(getApplicationContext(), reader.getString("message"), Toast.LENGTH_LONG).show();
+                    String type = reader.getString("type");
+                    Intent intent = new Intent(getApplicationContext(),DetailedInfo.class);
+                    intent.putExtra("Shop_name",reader.getString("name"));
+                    intent.putExtra("shop_intro",reader.getString("intro"));
+                    intent.putExtra("type",type);
+                    if(type.equalsIgnoreCase("shop")){
+                        intent.putExtra("discount_usage",reader.getString("usage"));
+                        intent.putExtra("rating_contact",reader.getString("contact_details"));
+                    }
+                    else{
+                        intent.putExtra("discount_usage",reader.getString("pids"));
+                        intent.putExtra("rating_contact",reader.getString("rating"));
+                    }
+                    startActivity(intent);
+                    return;
+                }
+
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        protected void onPreExecute() {
+
+        }
     }
 
 }

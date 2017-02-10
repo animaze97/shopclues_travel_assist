@@ -20,13 +20,11 @@ import java.net.URL;
 public class startScreen extends AppCompatActivity {
     ListView poiLv;
 
-    String URI = "http://192.168.29.49:8888/";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_screen);
-        String[] shopsAndCounters = {"Shop A", "Shop B", "Shop C", "Counter 1", "Counter 2", "Counter 3"};
+        String[] shopsAndCounters = { "Boarding Counter", "Security Check", "Check-in Counter", "Utility Store", "Gift Shop", "Delicious Restaurant" };
         ArrayAdapter adapter = new ArrayAdapter<String>(this, R.layout.poi_layout, shopsAndCounters);
         poiLv = (ListView) findViewById(R.id.poiListView);
         poiLv.setAdapter(adapter);
@@ -34,7 +32,7 @@ public class startScreen extends AppCompatActivity {
         poiLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                new makeQuery().execute(URI + "base/get/","b");
+                new makeQuery().execute(MainActivity.URI + "base/getBasic/",poiLv.getItemAtPosition(position).toString());
             }
         });
 
@@ -51,7 +49,7 @@ public class startScreen extends AppCompatActivity {
                 URL url = new URL(params[0]);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 JSONObject jsonParam = new JSONObject();
-                jsonParam.put("a", params[1]);
+                jsonParam.put("name", params[1]);
                 //jsonParam.put("body", params[2]);
                 return Requester.make_request(urlConnection, jsonParam.toString(), getApplicationContext());
             } catch (Exception e) {
@@ -76,13 +74,13 @@ public class startScreen extends AppCompatActivity {
                 }
                 else{
                     Toast.makeText(getApplicationContext(), reader.getString("message"), Toast.LENGTH_LONG).show();
-                    String name = reader.getString("message");
-                    String basicInfo = reader.getString("basic_info");
+                    String name = reader.getString("name");
+                    String basicInfo = reader.getString("intro");
                     Intent intent = new Intent(getApplicationContext(),BasicInfo.class);
                     intent.putExtra("name",name);
                     intent.putExtra("basic_info",basicInfo);
                     startActivity(intent);
-                    return;
+                    //return;
                 }
 
 
