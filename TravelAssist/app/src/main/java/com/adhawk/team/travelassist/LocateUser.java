@@ -21,18 +21,18 @@ public class LocateUser
 
     public LocateUser()
     {
-        this.beacon_pos.add(new Pair<Integer, Integer>(3,5));
-        this.beacon_pos.add(new Pair<Integer, Integer>(4,1));
-        this.beacon_pos.add(new Pair<Integer, Integer>(0,3));
+        this.beacon_pos.add(new Pair<Integer, Integer>(4,3));
+        this.beacon_pos.add(new Pair<Integer, Integer>(0,1));
+        this.beacon_pos.add(new Pair<Integer, Integer>(0,6));
 
         this.room_pos.add(new Pair<Integer, Integer>(0,6));
-        this.room_pos.add(new Pair<Integer, Integer>(6,6));
-        this.room_pos.add(new Pair<Integer, Integer>(6,0));
+        this.room_pos.add(new Pair<Integer, Integer>(4,6));
+        this.room_pos.add(new Pair<Integer, Integer>(4,0));
         this.room_pos.add(new Pair<Integer, Integer>(0,0));
 
 
-        this.dest_pos.add(new Pair<Integer, Integer>(0,6));
-        this.dest_pos.add(new Pair<Integer, Integer>(6,6));
+        this.dest_pos.add(new Pair<Integer, Integer>(0,1));
+        this.dest_pos.add(new Pair<Integer, Integer>(4,3));
 
         x_min=room_pos.get(0).getFirst();
         for(int i=0; i<4; i++)
@@ -75,11 +75,11 @@ public class LocateUser
             case "11111": return 0;
             case "22222": return 1;
             case "33333": return 2;
-            default: return -1;
+            default: return 2;
         }
     }
 
-    String getMajorFromName(String poi)
+    public static String getMajorFromName(String poi)
     {
         switch(poi)
         {
@@ -93,7 +93,7 @@ public class LocateUser
         return "33333";
     }
 
-    Pair<Integer, Integer> getLocation(String poi)
+    public static Pair<Integer, Integer> getLocation(String poi)
     {
         String major = getMajorFromName(poi);
         int index = getPos(major);
@@ -101,7 +101,7 @@ public class LocateUser
         return p;
     }
 
-    public static String getNearbyPoi(String major)
+    static String getNearbyPoi(String major)
     {
         switch (major)
         {
@@ -229,6 +229,13 @@ public class LocateUser
         return ans;
     }
 
+    private boolean isEqual(double a, double b)
+    {
+        if(Math.abs(a-b) < 0.1)
+            return true;
+        else return false;
+    }
+
     public Pair<Double, ArrayList<String>> getDestinationInfo(Pair<Integer, Integer> user_loc, Pair<Integer, Integer> destination)
     {
         double slope;
@@ -241,11 +248,15 @@ public class LocateUser
             slope = -1000;
             if(y2 < y1)
             {
-                instruction = "Move in East Direction";
+                instruction = "Move 45 Degrees in South West Direction";
+                //instruction = "Move in East Direction";
+                //move in 45* south west
             }
             else
             {
-                instruction = "Move in West Direction";
+                instruction = "Move 45 degrees in North East Direction";
+                //instruction = "Move in West Direction";
+                //move in 45* north east
             }
         }
         else
@@ -256,33 +267,122 @@ public class LocateUser
             {
                 if(y2 > y1 && x2 < x1)
                 {
-                    instruction = "Move " + Math.abs(angle) + " degrees in North East Direction ";
+                    //instruction = "Move " + Math.abs(angle) + " degrees in North East Direction ";
+                    angle = Math.abs(angle);
+                    if(isEqual(angle, 45) == true)
+                    {
+                        instruction = "Move in East Direction"; //South
+                    }
+                    else if(angle > 45)
+                    {
+                        angle-=45;
+                        instruction = "Move " + Math.abs(45-angle)+" degrees in North East Direction";
+                    }
+                    else
+                    {
+                        instruction = "Move " + Math.abs(angle+45) + " degrees in South East Direction";
+                    }
+                    //deg = Math.abs(angle)   if(deg==45)  south
+                    //if(deg>45){ deg-=45
+                    //      move deg in south west direction
+                    // }
+                    // else{  move 45-deg  in south east direction
+                    //}
+
                 }
                 else
                 {
-                    instruction = "Move " + Math.abs(angle) + " degrees in South West Direction";
+                    //instruction = "Move " + Math.abs(angle) + " degrees in South West Direction";
+                    angle = Math.abs(angle);
+                    if(isEqual(angle, 45) == true)
+                    {
+                        instruction = "Move in West Direction";
+                    }
+                    else if(angle > 45)
+                    {
+                        angle-=45;
+                        instruction = "Move " + Math.abs(90-angle)+" degrees in South West Direction";
+                    }
+                    else
+                    {
+                        instruction = "Move " + Math.abs(45+angle) + " degrees in North West Direction";
+                    }
+                    //deg = Math.abs(angle)   if(deg==45)  north
+                    //if(deg>45){ deg-=45
+                    //      move deg in north east direction
+                    // }
+                    // else{  move 45-deg  north west direction
+                    //}
                 }
             }
             else if(slope > 0)
             {
                 if(y2 > y1 && x2 > x1)
                 {
-                    instruction = "Move " + Math.abs(angle) + " degrees in South East Direction";
+                    //instruction = "Move " + Math.abs(angle) + " degrees in South East Direction";
+
+                    angle = Math.abs(angle);
+                    if(isEqual(angle, 45) == true)
+                    {
+                        instruction = "Move in North Direction";
+                    }
+                    else if(angle > 45)
+                    {
+                        angle-=45;
+                        instruction = "Move " + Math.abs(angle)+" degrees in North East Direction";
+                    }
+                    else
+                    {
+                        instruction = "Move " + Math.abs(45-angle) + " degrees in North West Direction";
+                    }
+
+                    //deg = Math.abs(angle)   if(deg==45)  west
+                    //if(deg>45){ deg-=45
+                    //      move 90-deg in south west direction
+                    // }
+                    // else{  move 45+deg   north west direction
+                    //}
                 }
                 else
                 {
-                    instruction = "Move " + Math.abs(angle) + " degrees in North West Direction";
+                    //instruction = "Move " + Math.abs(angle) + " degrees in North West Direction";
+
+                    angle = Math.abs(angle);
+                    if(isEqual(angle, 45) == true)
+                    {
+                        instruction = "Move in South Direction";
+                    }
+                    else if(angle > 45)
+                    {
+                        angle-=45;
+                        instruction = "Move " + Math.abs(angle)+" degrees in South West Direction";
+                    }
+                    else
+                    {
+                        instruction = "Move " + Math.abs(45-angle) + " degrees in South East Direction";
+                    }
+
+                    //deg = Math.abs(angle)   if(deg==45)  east
+                    //if(deg>45){ deg-=45
+                    //      move 90-deg in north east direction
+                    // }
+                    // else{  move 45+deg   south east direction
+                    //}
                 }
             }
             else
             {
                 if(x2 < x1)
                 {
-                    instruction = "Move in North Direction";
+                    instruction = "Move 45 degrees in South East Direction";
+                    //instruction = "Move in North Direction";
+                    //45* south east
                 }
                 else
                 {
-                    instruction = "Move in South Direction";
+                    instruction = "Move 45 degrees in North West Direction";
+                    //instruction = "Move in South Direction";
+                    //45* north west
                 }
             }
         }
@@ -296,5 +396,4 @@ public class LocateUser
 
         return new Pair<Double, ArrayList<String>>(dist/4, directions); //Units to metre
     }
-
 }

@@ -129,52 +129,11 @@ public class Navigation extends AppCompatActivity implements BeaconConsumer {
         LocateUser lUser = new LocateUser();
         clearCanvas();
        // plotPoints(LocateUser.beacon_pos);
-
         if(getIntent().getStringExtra("selected_poi")!=null){
             poiSelected = getIntent().getStringExtra("selected_poi");
-            if(poiSelected.equalsIgnoreCase("Boarding Counter")){
-                ArrayList<Pair<Integer,Integer>> points = new ArrayList<>();
-                destinationLocation = new Pair<Integer, Integer>(2,0);
-                points.add(destinationLocation);
-
-                //plotPoints(points);
-            }
-            else if(poiSelected.equalsIgnoreCase("Security Check")){
-                ArrayList<Pair<Integer,Integer>> points = new ArrayList<>();
-                destinationLocation = new Pair<Integer, Integer>(0,4);
-                points.add(destinationLocation);
-                //plotPoints(points);
-            }
-            else if(poiSelected.equalsIgnoreCase("Check-in Counter")){
-                ArrayList<Pair<Integer,Integer>> points = new ArrayList<>();
-                destinationLocation = new Pair<Integer, Integer>(3,3);
-                points.add(destinationLocation);
-                //plotPoints(points);
-            }
-            else if(poiSelected.equalsIgnoreCase("Utility Store")){
-                ArrayList<Pair<Integer,Integer>> points = new ArrayList<>();
-                destinationLocation = new Pair<Integer, Integer>(6,3);
-                points.add(destinationLocation);
-                //plotPoints(points);
-            }
-            else if(poiSelected.equalsIgnoreCase("Gift Shop")){
-                ArrayList<Pair<Integer,Integer>> points = new ArrayList<>();
-                destinationLocation = new Pair<Integer, Integer>(5,2);
-                points.add(destinationLocation);
-                //plotPoints(points);
-            }
-            else if(poiSelected.equalsIgnoreCase("Delicious Restaurant")){
-                ArrayList<Pair<Integer,Integer>> points = new ArrayList<>();
-                destinationLocation = new Pair<Integer, Integer>(4,4);
-                points.add(destinationLocation);
-                //plotPoints(points);
-            }
-            else {
-                ArrayList<Pair<Integer,Integer>> points = new ArrayList<>();
-                destinationLocation = new Pair<Integer, Integer>(3,3);
-                points.add(destinationLocation);
-                //plotPoints(points);
-            }
+            destinationLocation = LocateUser.getLocation(poiSelected);
+           // destinationLocation = new Pair<Integer, Integer>(100,100);
+            Log.d(TAG,"Dest : "+destinationLocation.getFirst()+" "+destinationLocation.getSecond());
             finalDestinationPoint.add(destinationLocation);
             tv_currentClass.setText(poiSelected);
         }
@@ -299,7 +258,7 @@ public class Navigation extends AppCompatActivity implements BeaconConsumer {
                         major.add(beacon.getId2().toString());
                     }
                     userLocation = LocateUser.getUserLocation(distances,major);
-                    Log.d(TAG,userLocation.getFirst() + "  "+ userLocation.getSecond());
+                    Log.d(TAG,"User Loc : " +userLocation.getFirst() + "  "+ userLocation.getSecond());
                     if(userLocation.getFirst()!=-1000){
                         points.add(userLocation);
                         plotPoints(points);
