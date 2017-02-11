@@ -12,9 +12,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:fontFamily="cursive"
         android:text="POI'S Around"
-        android:textSize="30dp"
-        android:id="@+id/view" />
+        android:id="@+id/view"
+        android:textStyle="normal|bold"
+        android:textSize="38sp"
+        />
 
     <ListView
         android:layout_width="wrap_content"
@@ -22,7 +26,9 @@
         android:id="@+id/poiListView"
         android:layout_below="@+id/view"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="81dp" />
+        android:layout_marginTop="81dp"
+        android:background="#AAAAFF"
+        android:padding="20dp"/>
 
 
 </RelativeLayout>

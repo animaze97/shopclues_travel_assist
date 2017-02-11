@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -7,22 +7,29 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.adhawk.team.travelassist.MainActivity">
+    tools:context="com.adhawk.team.travelassist.MainActivity"
+    android:orientation="vertical">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="71dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:layout_marginBottom="80dp"
         android:textSize="40dp"
-        android:text="New to the place..?  Not anymore.. Find all the places nearby and navigate to them using our Happy2Help application :)"/>
+        android:gravity="center"
+        android:background="#AAAAFF"
+        android:fontFamily="sans-serif-condensed"
+        android:text="New to the place?  Not anymore.Find all the places nearby and navigate to them using our Happy to Help application"/>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Whats Around ..?"
         android:id="@+id/whatsAroundButton"
+        android:textSize="20dp"
+        android:layout_gravity="center_horizontal"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="71dp" />
-</RelativeLayout>
+</LinearLayout>

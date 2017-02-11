@@ -24,7 +24,7 @@ public class startScreen extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_screen);
-        String[] shopsAndCounters = { "Boarding Counter", "Security Check", "Check-in Counter", "Utility Store", "Gift Shop", "Delicious Restaurant" };
+        String[] shopsAndCounters = { "Delicious Restaurant", "Gift Shop", "Boarding Counter", "Check-in Counter", "Utility Store", "Security Check"};
         ArrayAdapter adapter = new ArrayAdapter<String>(this, R.layout.poi_layout, shopsAndCounters);
         poiLv = (ListView) findViewById(R.id.poiListView);
         poiLv.setAdapter(adapter);

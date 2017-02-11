@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 import java.util.ArrayList;
@@ -16,7 +17,8 @@ public class MyMap extends View {
     public static ArrayList<Pair<Integer,Integer>> points = new ArrayList<>();
     public static boolean clearCanvas = false;
 
-    private final int paintColor = Color.BLACK;
+    private int cnt_clr = 0;
+    private  int paintColor = Color.BLACK;
     private Paint drawPaint;
 
     public MyMap(Context context, AttributeSet set) {
@@ -37,8 +39,8 @@ public class MyMap extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-       // if(clearCanvas)canvas.drawColor(Color.WHITE);
         for(Pair<Integer,Integer> p : points){
+            drawPaint.setColor(Color.BLACK);
             canvas.drawCircle(p.getFirst(),p.getSecond(),20,drawPaint);
         }
     }

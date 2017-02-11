@@ -21,42 +21,84 @@ public class LocateUser
 
     public LocateUser()
     {
-        this.beacon_pos.add(new Pair<Integer, Integer>(3,1));
+        this.beacon_pos.add(new Pair<Integer, Integer>(3,5));
         this.beacon_pos.add(new Pair<Integer, Integer>(4,1));
-        this.beacon_pos.add(new Pair<Integer, Integer>(2,1));
+        this.beacon_pos.add(new Pair<Integer, Integer>(0,3));
 
-        this.obstacle_pos.add(new Pair<Integer, Integer>(13,15));
-        this.obstacle_pos.add(new Pair<Integer, Integer>(15,15));
-        this.obstacle_pos.add(new Pair<Integer, Integer>(15, 13));
-        this.obstacle_pos.add(new Pair<Integer, Integer>(13, 13));
-
-
-
-        this.room_pos.add(new Pair<Integer, Integer>(0,24));
-        this.room_pos.add(new Pair<Integer, Integer>(24,24));
-        this.room_pos.add(new Pair<Integer, Integer>(24,0));
+        this.room_pos.add(new Pair<Integer, Integer>(0,6));
+        this.room_pos.add(new Pair<Integer, Integer>(6,6));
+        this.room_pos.add(new Pair<Integer, Integer>(6,0));
         this.room_pos.add(new Pair<Integer, Integer>(0,0));
 
 
-        this.dest_pos.add(new Pair<Integer, Integer>(0,24));
-        this.dest_pos.add(new Pair<Integer, Integer>(24,24));
+        this.dest_pos.add(new Pair<Integer, Integer>(0,6));
+        this.dest_pos.add(new Pair<Integer, Integer>(6,6));
 
-        x_min=0;
-        y_min=0;
-        x_max=24;
-        y_max=24;
+        x_min=room_pos.get(0).getFirst();
+        for(int i=0; i<4; i++)
+        {
+            if(room_pos.get(i).getFirst() < x_min)
+            {
+                x_min = room_pos.get(i).getFirst();
+            }
+        }
+        y_min=room_pos.get(0).getSecond();
+        for(int i=0; i<4; i++)
+        {
+            if(room_pos.get(i).getSecond() < y_min)
+            {
+                y_min = room_pos.get(i).getSecond();
+            }
+        }
+        x_max=room_pos.get(0).getFirst();
+        for(int i=0; i<4; i++)
+        {
+            if(room_pos.get(i).getFirst() > x_max)
+            {
+                x_max = room_pos.get(i).getFirst();
+            }
+        }
+        y_max=room_pos.get(0).getSecond();
+        for(int i=0; i<4; i++)
+        {
+            if(room_pos.get(i).getSecond() > y_max)
+            {
+                y_max = room_pos.get(i).getFirst();
+            }
+        }
     }
 
     public static int getPos(String s)
     {
-        //return (int)(Math.random()*3);
         switch (s)
         {
-            case "11111": return 2;
+            case "11111": return 0;
             case "22222": return 1;
-            case "33333": return 0;
+            case "33333": return 2;
             default: return -1;
         }
+    }
+
+    String getMajorFromName(String poi)
+    {
+        switch(poi)
+        {
+            case "Delicious Restaurant": return "11111";
+            case "Gift Shop": return "22222";
+            case "Security Check": return "33333";
+            case "Check-in Counter":
+            case "Utility Store":
+            case "Boarding Counter": return "33333";
+        }
+        return "33333";
+    }
+
+    Pair<Integer, Integer> getLocation(String poi)
+    {
+        String major = getMajorFromName(poi);
+        int index = getPos(major);
+        Pair<Integer, Integer> p = beacon_pos.get(index);
+        return p;
     }
 
     public static String getNearbyPoi(String major)
@@ -67,7 +109,7 @@ public class LocateUser
             case "22222": return "Gift Shop";
             case "33333": return "Security Check";
             case "44444": return "Check-in Counter";
-            default: return "Delicious Restaurant";
+            default: return "55555";
         }
     }
 

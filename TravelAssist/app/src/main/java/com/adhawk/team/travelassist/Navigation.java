@@ -47,12 +47,13 @@ public class Navigation extends AppCompatActivity implements BeaconConsumer {
     //Button bt_stopNavigation;
     ArrayList<String> instructions;
     ArrayAdapter<String> adapter;
-    String poiSelected = "Python";
+    String poiSelected = "Gift Shop";
     int cnt = 0;
     MyMap myMap;
     double distanceForPopup = 0.5;
     String nearbyPoi = "";
     int popUpFreq[] = {2,2,2,2,2,2};
+    ArrayList<Pair<Integer,Integer>> finalDestinationPoint = new ArrayList<Pair<Integer,Integer>>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,7 +104,7 @@ public class Navigation extends AppCompatActivity implements BeaconConsumer {
 
 
         lv_previousInstruction.setAdapter(adapter);
-        lv_previousInstruction.setBackgroundColor(Color.CYAN);
+        lv_previousInstruction.setBackgroundColor(0xFFAAAAFF);
         tv_currentClass.setText(poiSelected);
     }
 
@@ -127,7 +128,7 @@ public class Navigation extends AppCompatActivity implements BeaconConsumer {
         super.onStart();
         LocateUser lUser = new LocateUser();
         clearCanvas();
-        plotPoints(LocateUser.beacon_pos);
+       // plotPoints(LocateUser.beacon_pos);
 
         if(getIntent().getStringExtra("selected_poi")!=null){
             poiSelected = getIntent().getStringExtra("selected_poi");
@@ -135,44 +136,46 @@ public class Navigation extends AppCompatActivity implements BeaconConsumer {
                 ArrayList<Pair<Integer,Integer>> points = new ArrayList<>();
                 destinationLocation = new Pair<Integer, Integer>(2,0);
                 points.add(destinationLocation);
-                plotPoints(points);
+
+                //plotPoints(points);
             }
             else if(poiSelected.equalsIgnoreCase("Security Check")){
                 ArrayList<Pair<Integer,Integer>> points = new ArrayList<>();
                 destinationLocation = new Pair<Integer, Integer>(0,4);
                 points.add(destinationLocation);
-                plotPoints(points);
+                //plotPoints(points);
             }
             else if(poiSelected.equalsIgnoreCase("Check-in Counter")){
                 ArrayList<Pair<Integer,Integer>> points = new ArrayList<>();
                 destinationLocation = new Pair<Integer, Integer>(3,3);
                 points.add(destinationLocation);
-                plotPoints(points);
+                //plotPoints(points);
             }
             else if(poiSelected.equalsIgnoreCase("Utility Store")){
                 ArrayList<Pair<Integer,Integer>> points = new ArrayList<>();
                 destinationLocation = new Pair<Integer, Integer>(6,3);
                 points.add(destinationLocation);
-                plotPoints(points);
+                //plotPoints(points);
             }
             else if(poiSelected.equalsIgnoreCase("Gift Shop")){
                 ArrayList<Pair<Integer,Integer>> points = new ArrayList<>();
                 destinationLocation = new Pair<Integer, Integer>(5,2);
                 points.add(destinationLocation);
-                plotPoints(points);
+                //plotPoints(points);
             }
             else if(poiSelected.equalsIgnoreCase("Delicious Restaurant")){
                 ArrayList<Pair<Integer,Integer>> points = new ArrayList<>();
                 destinationLocation = new Pair<Integer, Integer>(4,4);
                 points.add(destinationLocation);
-                plotPoints(points);
+                //plotPoints(points);
             }
             else {
                 ArrayList<Pair<Integer,Integer>> points = new ArrayList<>();
                 destinationLocation = new Pair<Integer, Integer>(3,3);
                 points.add(destinationLocation);
-                plotPoints(points);
+                //plotPoints(points);
             }
+            finalDestinationPoint.add(destinationLocation);
             tv_currentClass.setText(poiSelected);
         }
     }
@@ -322,23 +325,30 @@ public class Navigation extends AppCompatActivity implements BeaconConsumer {
     }
 
     public void  plotPoints(ArrayList<Pair<Integer,Integer>> temp){
+        LocateUser lUser = new LocateUser();
+
+        temp.addAll(LocateUser.beacon_pos);
+        temp.addAll(finalDestinationPoint);
 
         ArrayList<Pair<Integer,Integer>> points = new ArrayList<Pair<Integer, Integer>>();
         //LocateUser lUser = new LocateUser();
         Display mdisp = getWindowManager().getDefaultDisplay();
         Point mdispSize = new Point();
         mdisp.getSize(mdispSize);
+
         int width = mdispSize.x;
         int height = mdispSize.y;
         height -= 1500;
         width -= 135;
         int x=12,y=12;
+        int xRange = LocateUser.x_max;
+        int yRange = LocateUser.y_max;
         Log.d(iTAG,"height "+String.valueOf(height));
         Log.d(iTAG,"width "+String.valueOf(width));
         for(Pair<Integer,Integer> pt : temp){
             x = pt.getFirst();
             y = pt.getSecond();
-            points.add(new Pair<Integer, Integer>((width/6)*(x)+20,(height/6)*(y)+20));
+            points.add(new Pair<Integer, Integer>((width/xRange)*(x)+25,(height/yRange)*(y)+25));
         }
         myMap.setPoints(points);
 
@@ -348,7 +358,11 @@ public class Navigation extends AppCompatActivity implements BeaconConsumer {
                 myMap.invalidate();
             }
         });
-
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
      /*   runOnUiThread(new Runnable() {
             @Override
             public void run() {
